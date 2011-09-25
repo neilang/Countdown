@@ -3,7 +3,7 @@
 //  Countdown
 //
 //  Created by Neil Ang on 15/09/11.
-//  Copyright 2011 __MyCompanyName__. All rights reserved.
+//  Copyright 2011 neilang.com. All rights reserved.
 //
 
 #import "RootViewController.h"
@@ -21,21 +21,13 @@
     // Set the app title
     self.title = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"];
     
-    // Get a reference to the event store
+    // Store a reference to the event store
     EKEventStore *eventStore = [[EKEventStore alloc] init];
     self.eventStore = eventStore;
     [eventStore release];
     
-    // Define a range of event dates we want to display
-    NSDate *startDate = [NSDate date];
-    NSDate *endDate   = [NSDate dateWithTimeIntervalSinceNow:(60*60*24*365)]; // 1 year from now
-
-    // Create a predicate matching the selected date range
-    NSPredicate *predicate = [self.eventStore predicateForEventsWithStartDate:startDate endDate:endDate calendars:nil];
-
-    // Query the event store using the predicate
-    self.events = [self.eventStore eventsMatchingPredicate:predicate];
-    
+    // Load the events from the event store
+    [self reloadEvents:nil];
     
     // The iOS simulator does not have any default events, so we will need to add some for demo purposes
     #ifdef TARGET_IPHONE_SIMULATOR
@@ -80,10 +72,35 @@
         [self.eventStore saveEvent:nextWeekEvent span:EKSpanThisEvent error:nil];
         
         // Perform the query again with newly added data
-        self.events = [self.eventStore eventsMatchingPredicate:predicate];
+        [self reloadEvents:nil];
     }
     #endif
     
+    // Add a refresh button
+    UIBarButtonItem *refresh = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
+                                                                             target:self 
+                                                                             action:@selector(reloadEvents:)];
+    self.navigationItem.rightBarButtonItem = refresh;
+    [refresh release];
+    
+}
+
+-(IBAction)reloadEvents:(id)sender{
+    
+    // Define a range of event dates we want to display
+    NSDate *startDate = [NSDate dateWithTimeIntervalSinceNow:(-1*60*60)]; // 1 hour in the past
+    NSDate *endDate   = [NSDate dateWithTimeIntervalSinceNow:(60*60*24*365)]; // 1 year from now
+
+    // Create a predicate to search all celndars with our date range
+    NSPredicate *predicate = [self.eventStore predicateForEventsWithStartDate:startDate 
+                                                                      endDate:endDate 
+                                                                    calendars:nil];
+    
+    // Query the event store using the predicate
+    self.events = [self.eventStore eventsMatchingPredicate:predicate];
+    
+    // Update the table view
+    [self.tableView reloadData];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView

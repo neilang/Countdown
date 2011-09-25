@@ -7,3 +7,6 @@ build/
 *.pbxuser
 *.perspective
 *.perspectivev3
+
+*.xcworkspace
+xcuserdata
