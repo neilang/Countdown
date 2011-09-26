@@ -14,7 +14,7 @@
 @synthesize label = _label;
 @synthesize timer = _timer;
 
-- (id)initWithEvent:(EKEvent *)event{
+- (id)initWithEvent:(EKEvent *)event {
     self = [super init];
     if (self) {
         self.event = event;
@@ -24,8 +24,7 @@
 
 #pragma mark - View lifecycle
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     
     // Set the ViewController title from the event name
@@ -38,15 +37,18 @@
     self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updateCountdown) userInfo:nil repeats:YES];
 }
 
-- (void)viewDidUnload
-{
+- (void)viewDidUnload {
     [super viewDidUnload];
-    
     self.event = nil;
+    self.label = nil;
+}
+
+-(void)dealloc {
+    [_event release];
+    [super dealloc];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    
 	if ([self.timer isValid]) {
 		[self.timer invalidate];
 		self.timer = nil;
@@ -56,7 +58,7 @@
 }
 
 // Calculate how many seconds are left until the event start date and update the label
-- (void)updateCountdown{
+- (void)updateCountdown {
     
     NSTimeInterval eventDate  = [self.event.startDate timeIntervalSince1970];
 	NSTimeInterval todaysDate = [[NSDate date] timeIntervalSince1970];

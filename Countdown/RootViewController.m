@@ -14,8 +14,7 @@
 @synthesize eventStore = _eventStore;
 @synthesize events     = _events;
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
     
     // Set the app title
@@ -31,7 +30,6 @@
     
     // The iOS simulator does not have any default events, so we will need to add some for demo purposes
     #ifdef TARGET_IPHONE_SIMULATOR
-    
     if([self.events count] < 1){
         
         NSLog(@"Adding sample events");
@@ -77,24 +75,20 @@
     #endif
     
     // Add a refresh button
-    UIBarButtonItem *refresh = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
-                                                                             target:self 
-                                                                             action:@selector(reloadEvents:)];
+    UIBarButtonItem *refresh = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(reloadEvents:)];
     self.navigationItem.rightBarButtonItem = refresh;
     [refresh release];
     
 }
 
--(IBAction)reloadEvents:(id)sender{
+-(IBAction)reloadEvents:(id)sender {
     
     // Define a range of event dates we want to display
     NSDate *startDate = [NSDate dateWithTimeIntervalSinceNow:(-1*60*60)]; // 1 hour in the past
     NSDate *endDate   = [NSDate dateWithTimeIntervalSinceNow:(60*60*24*365)]; // 1 year from now
 
     // Create a predicate to search all celndars with our date range
-    NSPredicate *predicate = [self.eventStore predicateForEventsWithStartDate:startDate 
-                                                                      endDate:endDate 
-                                                                    calendars:nil];
+    NSPredicate *predicate = [self.eventStore predicateForEventsWithStartDate:startDate endDate:endDate calendars:nil];
     
     // Query the event store using the predicate
     self.events = [self.eventStore eventsMatchingPredicate:predicate];
@@ -103,18 +97,15 @@
     [self.tableView reloadData];
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return [self.events count];
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *CellIdentifier = @"Cell";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -134,24 +125,23 @@
     return cell;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     EKEvent *event = [self.events objectAtIndex:indexPath.row];
     EventViewController *eventViewController = [[EventViewController alloc] initWithEvent:event];
     [self.navigationController pushViewController:eventViewController animated:YES];
     [eventViewController release];
 }
 
-- (void)viewDidUnload
-{
+- (void)viewDidUnload {
     [super viewDidUnload];
 
     self.events = nil;
     self.eventStore = nil;
 }
 
-- (void)dealloc
-{
+- (void)dealloc {
+    [_events release];
+    [_eventStore release];
     [super dealloc];
 }
 
