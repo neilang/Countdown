@@ -1,0 +1,1 @@
+This is a sample iOS 4 application for displaying events in the EventKit calendar. 
