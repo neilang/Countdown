@@ -12,7 +12,7 @@
 @interface RootViewController : UITableViewController
 
 @property (nonatomic, retain) EKEventStore *eventStore;
-@property (nonatomic, retain) NSArray *events;
+@property (nonatomic, retain) NSMutableArray *events;
 
 -(IBAction)reloadEvents:(id)sender;
 

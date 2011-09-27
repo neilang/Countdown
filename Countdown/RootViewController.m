@@ -90,8 +90,13 @@
     // Create a predicate to search all celndars with our date range
     NSPredicate *predicate = [self.eventStore predicateForEventsWithStartDate:startDate endDate:endDate calendars:nil];
     
-    // Query the event store using the predicate
-    self.events = [self.eventStore eventsMatchingPredicate:predicate];
+    // Query the event store using the predicate.
+    NSArray *results       = [self.eventStore eventsMatchingPredicate:predicate];
+    
+    // Convert the results to a mutable array and store so we can implement swipe to delete
+    NSMutableArray *events = [[NSMutableArray alloc] initWithArray:results];
+    self.events            = events;
+    [events release];
     
     // Update the table view
     [self.tableView reloadData];
@@ -135,7 +140,7 @@
 - (void)viewDidUnload {
     [super viewDidUnload];
 
-    self.events = nil;
+    self.events     = nil;
     self.eventStore = nil;
 }
 
@@ -143,6 +148,24 @@
     [_events release];
     [_eventStore release];
     [super dealloc];
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete)
+    {        
+        // Delete the event from the event store
+        [self.eventStore removeEvent:[self.events objectAtIndex:indexPath.row] span:EKSpanThisEvent error:nil];
+        
+        // Delete the row from the array
+        [self.events removeObjectAtIndex:indexPath.row];
+
+        // Delete the row from the data source.
+        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];        
+    }
 }
 
 @end
